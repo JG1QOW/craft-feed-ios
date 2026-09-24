@@ -1,20 +1,35 @@
+import React, { useMemo } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AuthProvider, useAuth } from './src/auth/AuthContext';
+import { I18nProvider, deviceLocale, localeFromLanguage } from './src/i18n';
+import { RootNavigator } from './src/navigation/RootNavigator';
 
-export default function App() {
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { retry: 1, staleTime: 30_000 } },
+});
+
+function LocalizedApp() {
+  const { user } = useAuth();
+  const fallback = useMemo(() => deviceLocale(), []);
+  const locale = localeFromLanguage(user?.language, fallback);
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <I18nProvider locale={locale}>
+      <RootNavigator />
+    </I18nProvider>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default function App() {
+  return (
+    <SafeAreaProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <LocalizedApp />
+          <StatusBar style="light" />
+        </AuthProvider>
+      </QueryClientProvider>
+    </SafeAreaProvider>
+  );
+}
