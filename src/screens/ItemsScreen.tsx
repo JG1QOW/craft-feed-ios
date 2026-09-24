@@ -106,7 +106,7 @@ export function ItemsScreen() {
           <Pressable
             style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
             onPress={() => openItem(item)}
-            onLongPress={() => markRead.mutate({ item, unread: !item.is_read })}
+            onLongPress={() => markRead.mutate({ item, unread: item.is_read })}
           >
             <View style={styles.dotColumn}>
               {!item.is_read && <View style={styles.dot} />}
