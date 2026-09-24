@@ -59,7 +59,8 @@ function MainTabs() {
         tabBarActiveTintColor: colors.primaryDark,
         tabBarInactiveTintColor: colors.textMuted,
         tabBarStyle: { backgroundColor: colors.card, borderTopColor: colors.border },
-        tabBarLabelStyle: { fontWeight: '600' },
+        tabBarLabelStyle: { fontWeight: '600', fontSize: 11, lineHeight: 16 },
+        tabBarItemStyle: { paddingVertical: 2 },
       }}
     >
       <Tabs.Screen
