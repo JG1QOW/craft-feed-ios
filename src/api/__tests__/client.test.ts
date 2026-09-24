@@ -69,4 +69,10 @@ describe('request', () => {
     const body = JSON.parse(mockFetch.mock.calls[0][1].body);
     expect(body).toEqual({ email: 'a@b.c', password: 'pw', device_name: expect.any(String) });
   });
+
+  it('unwraps the user from /auth/me', async () => {
+    const user = { id: 1, name: 'A', email: 'a@b.c', role: 'user', language: 'English' };
+    mockFetch.mockReturnValue(jsonResponse(200, { user }));
+    await expect(auth.me('tok')).resolves.toEqual(user);
+  });
 });

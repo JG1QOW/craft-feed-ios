@@ -94,7 +94,7 @@ export const auth = {
     }),
   forgotPassword: (email: string) =>
     request<{ message?: string }>('/auth/forgot-password', { method: 'POST', body: { email } }),
-  me: (token: string) => request<User>('/auth/me', { token }),
+  me: (token: string) => request<{ user: User }>('/auth/me', { token }).then((r) => r.user),
   logout: (token: string) => request<{ message?: string }>('/auth/logout', { method: 'POST', token }),
 };
 
