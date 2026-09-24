@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
 import { useAuth } from '../auth/AuthContext';
-import { Button, ErrorText, Input } from '../components/ui';
+import { Button, Card, ErrorText, Input, Label } from '../components/ui';
 import { useI18n } from '../i18n';
 import { colors, spacing } from '../theme';
 import { errorMessage } from '../utils/errors';
@@ -30,8 +30,11 @@ export function RegisterScreen() {
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps="handled">
+      <ScrollView contentContainerStyle={styles.body} keyboardShouldPersistTaps="handled">
+        <Card style={styles.form}>
+        <Label>{t.auth.name}</Label>
         <Input placeholder={t.auth.name} value={name} onChangeText={setName} autoCapitalize="words" textContentType="name" />
+        <Label>{t.auth.email}</Label>
         <Input
           placeholder={t.auth.email}
           value={email}
@@ -39,6 +42,7 @@ export function RegisterScreen() {
           keyboardType="email-address"
           textContentType="emailAddress"
         />
+        <Label>{t.auth.password}</Label>
         <Input
           placeholder={t.auth.password}
           value={password}
@@ -46,6 +50,7 @@ export function RegisterScreen() {
           secureTextEntry
           textContentType="newPassword"
         />
+        <Label>{t.auth.passwordConfirmation}</Label>
         <Input
           placeholder={t.auth.passwordConfirmation}
           value={confirm}
@@ -56,6 +61,7 @@ export function RegisterScreen() {
         />
         <ErrorText message={error} />
         <Button title={t.auth.register} onPress={submit} loading={loading} />
+        </Card>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -63,5 +69,6 @@ export function RegisterScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  form: { padding: spacing.lg, gap: spacing.md },
+  body: { padding: spacing.md },
+  form: { padding: spacing.md, gap: spacing.sm + 2 },
 });

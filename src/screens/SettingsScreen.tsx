@@ -5,11 +5,12 @@ import Constants from 'expo-constants';
 import * as WebBrowser from 'expo-web-browser';
 import { account } from '../api/client';
 import { useAuth } from '../auth/AuthContext';
+import { Segmented } from '../components/ui';
 import { API_BASE_URL } from '../config';
 import { languageFromLocale, useI18n } from '../i18n';
 import type { Locale } from '../i18n/translations';
 import type { SettingsStackParamList } from '../navigation/types';
-import { colors, spacing } from '../theme';
+import { colors, radii, shadow, spacing } from '../theme';
 import { errorMessage } from '../utils/errors';
 
 type Props = NativeStackScreenProps<SettingsStackParamList, 'SettingsHome'>;
@@ -67,9 +68,15 @@ export function SettingsScreen({ navigation }: Props) {
       </View>
 
       <Text style={styles.section}>{t.settings.language}</Text>
-      <View style={styles.card}>
-        <Row label={t.settings.english} value={locale === 'en' ? '✓' : ''} onPress={() => changeLanguage('en')} />
-        <Row label={t.settings.japanese} value={locale === 'ja' ? '✓' : ''} onPress={() => changeLanguage('ja')} />
+      <View style={[styles.card, styles.languageCard]}>
+        <Segmented<Locale>
+          value={locale}
+          onChange={(v) => void changeLanguage(v)}
+          options={[
+            { value: 'en', label: t.settings.english },
+            { value: 'ja', label: t.settings.japanese },
+          ]}
+        />
       </View>
 
       <View style={styles.card}>
@@ -88,8 +95,16 @@ export function SettingsScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   content: { padding: spacing.md, gap: spacing.sm, paddingBottom: spacing.lg },
-  section: { color: colors.textMuted, fontSize: 13, textTransform: 'uppercase', marginTop: spacing.md, marginLeft: spacing.xs },
-  card: { backgroundColor: colors.card, borderRadius: 12, overflow: 'hidden', borderWidth: StyleSheet.hairlineWidth, borderColor: colors.border },
+  section: { color: colors.primaryDark, fontSize: 14, fontWeight: '600', marginTop: spacing.md, marginLeft: spacing.xs },
+  card: {
+    backgroundColor: colors.card,
+    borderRadius: radii.lg,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: colors.border,
+    ...shadow.card,
+  },
+  languageCard: { padding: spacing.md },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -99,8 +114,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.border,
   },
-  rowPressed: { backgroundColor: '#f0fdf4' },
-  rowLabel: { fontSize: 16, color: colors.text },
+  rowPressed: { backgroundColor: '#e6f7f7' },
+  rowLabel: { fontSize: 16, color: colors.text, fontWeight: '500' },
   rowValue: { fontSize: 15, color: colors.textMuted, maxWidth: '60%' },
   danger: { color: colors.danger },
   version: { textAlign: 'center', color: colors.textMuted, fontSize: 12, marginTop: spacing.lg },

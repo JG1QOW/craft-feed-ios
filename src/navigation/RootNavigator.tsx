@@ -4,7 +4,7 @@ import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useAuth } from '../auth/AuthContext';
-import { Loading } from '../components/ui';
+import { HeaderBackground, HeaderTitle, Loading } from '../components/ui';
 import { useI18n } from '../i18n';
 import { DeleteAccountScreen } from '../screens/DeleteAccountScreen';
 import { FeedsScreen } from '../screens/FeedsScreen';
@@ -23,7 +23,14 @@ const headerStyle = {
   headerStyle: { backgroundColor: colors.primary },
   headerTintColor: '#fff',
   headerTitleStyle: { fontWeight: '700' as const },
+  headerBackground: () => <HeaderBackground />,
+  headerShadowVisible: false,
 };
+
+const brandedTitle = (title: string) => ({
+  title,
+  headerTitle: () => <HeaderTitle title={title} />,
+});
 
 function TabIcon({ glyph, color }: { glyph: string; color: string }) {
   return <Text style={{ fontSize: 20, color }}>{glyph}</Text>;
@@ -33,7 +40,7 @@ function SettingsNavigator() {
   const { t } = useI18n();
   return (
     <SettingsStack.Navigator screenOptions={headerStyle}>
-      <SettingsStack.Screen name="SettingsHome" component={SettingsScreen} options={{ title: t.settings.title }} />
+      <SettingsStack.Screen name="SettingsHome" component={SettingsScreen} options={brandedTitle(t.settings.title)} />
       <SettingsStack.Screen
         name="DeleteAccount"
         component={DeleteAccountScreen}
@@ -51,13 +58,15 @@ function MainTabs() {
         ...headerStyle,
         tabBarActiveTintColor: colors.primaryDark,
         tabBarInactiveTintColor: colors.textMuted,
+        tabBarStyle: { backgroundColor: colors.card, borderTopColor: colors.border },
+        tabBarLabelStyle: { fontWeight: '600' },
       }}
     >
       <Tabs.Screen
         name="ItemsTab"
         component={ItemsScreen}
         options={{
-          title: t.items.title,
+          ...brandedTitle(t.items.title),
           tabBarLabel: t.tabs.items,
           tabBarIcon: ({ color }) => <TabIcon glyph="☰" color={color} />,
         }}
@@ -66,7 +75,7 @@ function MainTabs() {
         name="FeedsTab"
         component={FeedsScreen}
         options={{
-          title: t.feeds.title,
+          ...brandedTitle(t.feeds.title),
           tabBarLabel: t.tabs.feeds,
           tabBarIcon: ({ color }) => <TabIcon glyph="◉" color={color} />,
         }}

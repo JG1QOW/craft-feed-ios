@@ -1,13 +1,13 @@
 import React, { useCallback, useState } from 'react';
-import { FlatList, Pressable, RefreshControl, StyleSheet, Switch, Text, View } from 'react-native';
+import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { useInfiniteQuery, useMutation, useQueryClient, type InfiniteData } from '@tanstack/react-query';
 import * as WebBrowser from 'expo-web-browser';
 import { items as itemsApi } from '../api/client';
 import type { Item, ItemsResponse } from '../api/types';
 import { useAuth } from '../auth/AuthContext';
-import { Button, Centered, Loading } from '../components/ui';
+import { Button, Centered, CountPill, Loading, Segmented } from '../components/ui';
 import { useI18n } from '../i18n';
-import { colors, spacing } from '../theme';
+import { colors, radii, shadow, spacing } from '../theme';
 import { formatDate } from '../utils/date';
 import { errorMessage } from '../utils/errors';
 
@@ -84,16 +84,20 @@ export function ItemsScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.toolbar}>
-        <Text style={styles.unreadCount}>{format(t.items.unreadCount, { count: totalUnread })}</Text>
-        <View style={styles.toggle}>
-          <Text style={styles.toggleLabel}>{t.items.unreadOnly}</Text>
-          <Switch value={unreadOnly} onValueChange={setUnreadOnly} trackColor={{ true: colors.primary }} />
-        </View>
+        <Segmented
+          value={unreadOnly ? 'unread' : 'all'}
+          onChange={(v) => setUnreadOnly(v === 'unread')}
+          options={[
+            { value: 'all', label: t.items.all },
+            { value: 'unread', label: t.items.unreadOnly },
+          ]}
+        />
+        <CountPill>{format(t.items.unreadCount, { count: totalUnread })}</CountPill>
       </View>
       <FlatList
         data={allItems}
         keyExtractor={(item, index) => `${item.feed_uuid}:${item.item_url}:${index}`}
-        contentContainerStyle={allItems.length === 0 ? styles.emptyContainer : undefined}
+        contentContainerStyle={allItems.length === 0 ? styles.emptyContainer : styles.listContent}
         refreshControl={<RefreshControl refreshing={query.isRefetching && !query.isFetchingNextPage} onRefresh={() => query.refetch()} />}
         onEndReached={() => {
           if (query.hasNextPage && !query.isFetchingNextPage) query.fetchNextPage();
@@ -104,21 +108,29 @@ export function ItemsScreen() {
         }
         renderItem={({ item }) => (
           <Pressable
-            style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
+            style={({ pressed }) => [styles.card, item.is_read && styles.cardRead, pressed && styles.cardPressed]}
             onPress={() => openItem(item)}
             onLongPress={() => markRead.mutate({ item, unread: item.is_read })}
           >
-            <View style={styles.dotColumn}>
-              {!item.is_read && <View style={styles.dot} />}
-            </View>
-            <View style={styles.rowBody}>
-              <Text style={[styles.itemTitle, item.is_read && styles.readTitle]} numberOfLines={2}>
-                {item.item_title || item.item_url}
+            <View style={styles.cardTop}>
+              <Pressable
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: !item.is_read }}
+                accessibilityLabel={item.is_read ? t.items.markUnread : t.items.markRead}
+                hitSlop={8}
+                onPress={() => markRead.mutate({ item, unread: item.is_read })}
+                style={[styles.checkbox, !item.is_read && styles.checkboxChecked]}
+              >
+                {!item.is_read && <Text style={styles.checkmark}>✓</Text>}
+              </Pressable>
+              <Text style={styles.feedTitle} numberOfLines={1}>
+                {item.feed_title}
               </Text>
-              <Text style={styles.meta} numberOfLines={1}>
-                {item.feed_title} · {formatDate(item.pub_date ?? item.created_at, locale, '')}
-              </Text>
+              <Text style={styles.date}>{formatDate(item.pub_date ?? item.created_at, locale, '')}</Text>
             </View>
+            <Text style={[styles.itemTitle, item.is_read && styles.readTitle]} numberOfLines={3}>
+              {item.item_title || item.item_url}
+            </Text>
           </Pressable>
         )}
       />
@@ -132,30 +144,39 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: spacing.sm,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    backgroundColor: colors.card,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.border,
   },
-  unreadCount: { color: colors.primaryDark, fontWeight: '600' },
-  toggle: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  toggleLabel: { color: colors.textMuted },
-  row: {
-    flexDirection: 'row',
+  listContent: { paddingHorizontal: 12, paddingBottom: spacing.lg, gap: 12 },
+  card: {
     backgroundColor: colors.card,
-    paddingVertical: 12,
-    paddingRight: spacing.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.border,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 12,
+    gap: 8,
+    ...shadow.card,
   },
-  rowPressed: { backgroundColor: '#f0fdf4' },
-  dotColumn: { width: 28, alignItems: 'center', paddingTop: 6 },
-  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.unreadDot },
-  rowBody: { flex: 1, gap: 4 },
-  itemTitle: { fontSize: 16, color: colors.text, fontWeight: '600' },
-  readTitle: { color: colors.textMuted, fontWeight: '400' },
-  meta: { fontSize: 12, color: colors.textMuted },
+  cardRead: { backgroundColor: colors.readBackground, borderColor: colors.borderStrong },
+  cardPressed: { backgroundColor: '#e6f7f7' },
+  cardTop: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  checkbox: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderWidth: 2,
+    borderColor: colors.borderStrong,
+    backgroundColor: colors.card,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkboxChecked: { backgroundColor: colors.primary, borderColor: colors.primary },
+  checkmark: { color: '#fff', fontSize: 11, fontWeight: '700', lineHeight: 13 },
+  feedTitle: { flex: 1, fontSize: 13, fontWeight: '600', color: colors.text },
+  date: { fontSize: 12, color: colors.textMuted },
+  itemTitle: { fontSize: 15, color: colors.primary, fontWeight: '500', lineHeight: 22 },
+  readTitle: { color: colors.textMuted },
   emptyContainer: { flexGrow: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.lg },
   muted: { color: colors.textMuted, textAlign: 'center' },
 });
