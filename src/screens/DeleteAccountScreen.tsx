@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import { useAuth } from '../auth/AuthContext';
-import { Button, ErrorText, Input } from '../components/ui';
+import { Button, Card, ErrorText, Input, Label } from '../components/ui';
 import { useI18n } from '../i18n';
-import { colors, spacing } from '../theme';
+import { colors, radii, spacing } from '../theme';
 import { errorMessage } from '../utils/errors';
 
 export function DeleteAccountScreen() {
@@ -34,7 +34,11 @@ export function DeleteAccountScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.warning}>{t.settings.deleteAccountWarning}</Text>
+      <Card style={styles.card}>
+      <View style={styles.warningBox}>
+        <Text style={styles.warning}>{t.settings.deleteAccountWarning}</Text>
+      </View>
+      <Label>{t.auth.password}</Label>
       <Input
         placeholder={t.auth.password}
         value={password}
@@ -51,11 +55,21 @@ export function DeleteAccountScreen() {
         loading={loading}
         disabled={password.length === 0}
       />
+      </Card>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background, padding: spacing.lg, gap: spacing.md },
-  warning: { color: colors.text, fontSize: 15, lineHeight: 22 },
+  container: { flex: 1, backgroundColor: colors.background, padding: spacing.md },
+  card: { padding: spacing.md, gap: spacing.sm + 2 },
+  warningBox: {
+    backgroundColor: '#fef2f2',
+    borderWidth: 1,
+    borderColor: '#fecaca',
+    borderRadius: radii.md,
+    padding: 12,
+    marginBottom: spacing.xs,
+  },
+  warning: { color: '#991b1b', fontSize: 14, lineHeight: 21 },
 });
