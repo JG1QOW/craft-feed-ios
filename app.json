@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Craft Feed",
-    "slug": "craft-feed",
+    "slug": "craft-feed-ios",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -41,7 +41,10 @@
       ]
     ],
     "extra": {
-      "apiUrl": "https://craft-feed.com"
+      "apiUrl": "https://craft-feed.com",
+      "eas": {
+        "projectId": "b8b0ced9-7b1e-4ad1-ab21-cbba60c57a51"
+      }
     }
   }
 }

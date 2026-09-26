@@ -42,6 +42,8 @@ eas build --platform ios --profile production   # クラウドで .ipa を作成
 eas submit --platform ios                       # TestFlight / App Store Connect へ提出
 ```
 
+EAS プロジェクトは expo.dev の `craft-feed-ios`（`app.json` の `extra.eas.projectId`）に紐づいています。初回の `eas build` では Apple Developer アカウントでのログインを求められ、証明書と Provisioning Profile が自動生成されます。
+
 Apple Developer Program のアカウントと、`app.json` の `ios.bundleIdentifier`（現在は仮の `com.craftfeed.app`）の確定が必要です。
 
 ## 構成

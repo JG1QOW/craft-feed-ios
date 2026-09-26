@@ -13,7 +13,8 @@
       "distribution": "internal"
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": { "EXPO_PUBLIC_API_URL": "https://craft-feed.com" }
     }
   },
   "submit": {
