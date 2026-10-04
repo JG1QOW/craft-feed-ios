@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { ApiError, account, auth, setUnauthorizedHandler } from '../api/client';
-import type { User } from '../api/types';
+import type { SocialProvider, User } from '../api/types';
 import { tokenStorage } from './tokenStorage';
 
 interface AuthState {
@@ -9,6 +9,7 @@ interface AuthState {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string, passwordConfirmation: string) => Promise<void>;
+  loginWithSocial: (params: { provider: SocialProvider; idToken: string; nonce?: string; name?: string }) => Promise<void>;
   logout: () => Promise<void>;
   deleteAccount: (password: string) => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -76,6 +77,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [applySession],
   );
 
+  const loginWithSocial = useCallback(
+    async (params: { provider: SocialProvider; idToken: string; nonce?: string; name?: string }) => {
+      const res = await auth.social(params);
+      await applySession(res.token, res.user);
+    },
+    [applySession],
+  );
+
   const logout = useCallback(async () => {
     if (token) {
       try {
@@ -102,8 +111,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [token]);
 
   const value = useMemo<AuthState>(
-    () => ({ token, user, loading, login, register, logout, deleteAccount, refreshUser, setUser }),
-    [token, user, loading, login, register, logout, deleteAccount, refreshUser],
+    () => ({ token, user, loading, login, register, loginWithSocial, logout, deleteAccount, refreshUser, setUser }),
+    [token, user, loading, login, register, loginWithSocial, logout, deleteAccount, refreshUser],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

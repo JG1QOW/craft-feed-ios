@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { auth } from '../api/client';
 import { useAuth } from '../auth/AuthContext';
+import { SocialLoginButtons } from '../components/SocialLoginButtons';
 import { Button, Card, ErrorText, Input, Label } from '../components/ui';
 import { useI18n } from '../i18n';
 import type { AuthStackParamList } from '../navigation/types';
@@ -86,6 +87,7 @@ export function LoginScreen({ navigation }: Props) {
         <Pressable onPress={forgot} style={styles.link}>
           <Text style={styles.linkText}>{t.auth.forgotPassword}</Text>
         </Pressable>
+        <SocialLoginButtons onError={setError} />
         <View style={styles.footer}>
           <Text style={styles.muted}>{t.auth.noAccount}</Text>
           <Pressable onPress={() => navigation.navigate('Register')}>

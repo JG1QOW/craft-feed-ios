@@ -27,6 +27,10 @@ const en = {
     haveAccount: 'Already have an account?',
     loginFailed: 'Login failed',
     registerFailed: 'Registration failed',
+    or: 'or',
+    continueWithGoogle: 'Continue with Google',
+    continueWithApple: 'Continue with Apple',
+    socialFailed: 'Sign-in was cancelled or failed',
   },
   tabs: {
     items: 'Items',
@@ -107,6 +111,10 @@ const ja: typeof en = {
     haveAccount: 'すでにアカウントをお持ちの方',
     loginFailed: 'ログインに失敗しました',
     registerFailed: '登録に失敗しました',
+    or: 'または',
+    continueWithGoogle: 'Google で続ける',
+    continueWithApple: 'Apple で続ける',
+    socialFailed: 'サインインがキャンセルまたは失敗しました',
   },
   tabs: {
     items: 'アイテム',
