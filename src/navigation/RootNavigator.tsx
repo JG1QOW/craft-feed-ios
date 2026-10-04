@@ -1,23 +1,26 @@
 import React from 'react';
-import { Text } from 'react-native';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Pressable } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../auth/AuthContext';
 import { HeaderBackground, HeaderTitle, Loading } from '../components/ui';
 import { useI18n } from '../i18n';
 import { DeleteAccountScreen } from '../screens/DeleteAccountScreen';
 import { FeedsScreen } from '../screens/FeedsScreen';
 import { ItemsScreen } from '../screens/ItemsScreen';
+import { ItemViewerScreen } from '../screens/ItemViewerScreen';
 import { LoginScreen } from '../screens/LoginScreen';
 import { RegisterScreen } from '../screens/RegisterScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { colors } from '../theme';
-import type { AuthStackParamList, MainTabParamList, SettingsStackParamList } from './types';
+import type { AuthStackParamList, ItemsStackParamList, MainTabParamList, SettingsStackParamList } from './types';
 
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 const Tabs = createBottomTabNavigator<MainTabParamList>();
 const SettingsStack = createNativeStackNavigator<SettingsStackParamList>();
+const ItemsStack = createNativeStackNavigator<ItemsStackParamList>();
 
 const headerStyle = {
   headerStyle: { backgroundColor: colors.primary },
@@ -32,8 +35,32 @@ const brandedTitle = (title: string) => ({
   headerTitle: () => <HeaderTitle title={title} />,
 });
 
-function TabIcon({ glyph, color }: { glyph: string; color: string }) {
-  return <Text style={{ fontSize: 20, color }}>{glyph}</Text>;
+type IconName = React.ComponentProps<typeof Ionicons>['name'];
+
+function TabIcon({ name, color }: { name: IconName; color: string }) {
+  return <Ionicons name={name} size={22} color={color} />;
+}
+
+function ItemsNavigator() {
+  const { t } = useI18n();
+  return (
+    <ItemsStack.Navigator screenOptions={headerStyle}>
+      <ItemsStack.Screen name="ItemsList" component={ItemsScreen} options={brandedTitle(t.items.title)} />
+      <ItemsStack.Screen
+        name="ItemViewer"
+        component={ItemViewerScreen}
+        options={({ navigation }) => ({
+          title: '',
+          headerBackVisible: false,
+          headerRight: () => (
+            <Pressable accessibilityRole="button" accessibilityLabel={t.common.close} hitSlop={10} onPress={() => navigation.goBack()}>
+              <Ionicons name="close" size={26} color="#fff" />
+            </Pressable>
+          ),
+        })}
+      />
+    </ItemsStack.Navigator>
+  );
 }
 
 function SettingsNavigator() {
@@ -65,11 +92,11 @@ function MainTabs() {
     >
       <Tabs.Screen
         name="ItemsTab"
-        component={ItemsScreen}
+        component={ItemsNavigator}
         options={{
-          ...brandedTitle(t.items.title),
+          headerShown: false,
           tabBarLabel: t.tabs.items,
-          tabBarIcon: ({ color }) => <TabIcon glyph="☰" color={color} />,
+          tabBarIcon: ({ color }) => <TabIcon name="list-outline" color={color} />,
         }}
       />
       <Tabs.Screen
@@ -78,7 +105,7 @@ function MainTabs() {
         options={{
           ...brandedTitle(t.feeds.title),
           tabBarLabel: t.tabs.feeds,
-          tabBarIcon: ({ color }) => <TabIcon glyph="◉" color={color} />,
+          tabBarIcon: ({ color }) => <TabIcon name="logo-rss" color={color} />,
         }}
       />
       <Tabs.Screen
@@ -87,7 +114,7 @@ function MainTabs() {
         options={{
           headerShown: false,
           tabBarLabel: t.tabs.settings,
-          tabBarIcon: ({ color }) => <TabIcon glyph="⚙" color={color} />,
+          tabBarIcon: ({ color }) => <TabIcon name="settings-outline" color={color} />,
         }}
       />
     </Tabs.Navigator>

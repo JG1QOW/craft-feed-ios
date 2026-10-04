@@ -1,22 +1,25 @@
 import React, { useCallback, useState } from 'react';
 import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
-import { useInfiniteQuery, useMutation, useQueryClient, type InfiniteData } from '@tanstack/react-query';
-import * as WebBrowser from 'expo-web-browser';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { items as itemsApi } from '../api/client';
-import type { Item, ItemsResponse } from '../api/types';
+import type { Item } from '../api/types';
 import { useAuth } from '../auth/AuthContext';
-import { Button, Centered, CountPill, Loading, Segmented } from '../components/ui';
+import { Button, Centered, CountPill, Loading, ReadCheckbox, Segmented } from '../components/ui';
 import { useI18n } from '../i18n';
+import { useMarkRead } from '../items/useMarkRead';
+import type { ItemsStackParamList } from '../navigation/types';
 import { colors, radii, shadow, spacing } from '../theme';
 import { formatDate } from '../utils/date';
 import { errorMessage } from '../utils/errors';
 
 const PAGE_SIZE = 50;
 
-export function ItemsScreen() {
+type Props = NativeStackScreenProps<ItemsStackParamList, 'ItemsList'>;
+
+export function ItemsScreen({ navigation }: Props) {
   const { t, locale, format } = useI18n();
   const { token } = useAuth();
-  const queryClient = useQueryClient();
   const [unreadOnly, setUnreadOnly] = useState(true);
 
   const queryKey = ['items', unreadOnly] as const;
@@ -30,41 +33,9 @@ export function ItemsScreen() {
     getNextPageParam: (last) => (last.has_more ? last.offset + last.limit : undefined),
   });
 
-  const markRead = useMutation({
-    mutationFn: (vars: { item: Item; unread: boolean }) =>
-      itemsApi.markRead(token!, {
-        feed_uuid: vars.item.feed_uuid,
-        item_url: vars.item.item_url,
-        item_title: vars.item.item_title,
-        unread: vars.unread,
-      }),
-    onMutate: ({ item, unread }) => {
-      queryClient.setQueriesData<InfiniteData<ItemsResponse>>({ queryKey: ['items'] }, (data) => {
-        if (!data) return data;
-        return {
-          ...data,
-          pages: data.pages.map((page) => ({
-            ...page,
-            total_unread: Math.max(0, page.total_unread + (unread ? 1 : -1)),
-            items: page.items.map((i) =>
-              i.feed_uuid === item.feed_uuid && i.item_url === item.item_url ? { ...i, is_read: !unread } : i,
-            ),
-          })),
-        };
-      });
-    },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ['items'] }),
-  });
+  const markRead = useMarkRead();
 
-  const openItem = useCallback(
-    async (item: Item) => {
-      if (!item.is_read) markRead.mutate({ item, unread: false });
-      if (item.item_url) {
-        await WebBrowser.openBrowserAsync(item.item_url, { presentationStyle: WebBrowser.WebBrowserPresentationStyle.PAGE_SHEET });
-      }
-    },
-    [markRead],
-  );
+  const openItem = useCallback((item: Item) => navigation.navigate('ItemViewer', { item }), [navigation]);
 
   const allItems = query.data?.pages.flatMap((p) => p.items) ?? [];
   const totalUnread = query.data?.pages[0]?.total_unread ?? 0;
@@ -113,16 +84,11 @@ export function ItemsScreen() {
             onLongPress={() => markRead.mutate({ item, unread: item.is_read })}
           >
             <View style={styles.cardTop}>
-              <Pressable
-                accessibilityRole="checkbox"
-                accessibilityState={{ checked: !item.is_read }}
-                accessibilityLabel={item.is_read ? t.items.markUnread : t.items.markRead}
-                hitSlop={8}
+              <ReadCheckbox
+                checked={!item.is_read}
                 onPress={() => markRead.mutate({ item, unread: item.is_read })}
-                style={[styles.checkbox, !item.is_read && styles.checkboxChecked]}
-              >
-                {!item.is_read && <Text style={styles.checkmark}>✓</Text>}
-              </Pressable>
+                label={item.is_read ? t.items.markUnread : t.items.markRead}
+              />
               <Text style={styles.feedTitle} numberOfLines={1}>
                 {item.feed_title}
               </Text>
@@ -161,18 +127,6 @@ const styles = StyleSheet.create({
   cardRead: { backgroundColor: colors.readBackground, borderColor: colors.borderStrong },
   cardPressed: { backgroundColor: '#e6f7f7' },
   cardTop: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  checkbox: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    borderWidth: 2,
-    borderColor: colors.borderStrong,
-    backgroundColor: colors.card,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  checkboxChecked: { backgroundColor: colors.primary, borderColor: colors.primary },
-  checkmark: { color: '#fff', fontSize: 11, fontWeight: '700', lineHeight: 13 },
   feedTitle: { flex: 1, fontSize: 13, fontWeight: '600', color: colors.text },
   date: { fontSize: 12, color: colors.textMuted },
   itemTitle: { fontSize: 15, color: colors.primary, fontWeight: '500', lineHeight: 22 },
