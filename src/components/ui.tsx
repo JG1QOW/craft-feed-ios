@@ -167,6 +167,31 @@ export function ErrorText({ message }: { message?: string | null }) {
   );
 }
 
+export function ReadCheckbox({
+  checked,
+  onPress,
+  label,
+  onDark,
+}: {
+  checked: boolean;
+  onPress: () => void;
+  label: string;
+  onDark?: boolean;
+}) {
+  return (
+    <Pressable
+      accessibilityRole="checkbox"
+      accessibilityState={{ checked }}
+      accessibilityLabel={label}
+      hitSlop={10}
+      onPress={onPress}
+      style={[styles.checkbox, onDark && styles.checkboxOnDark, checked && styles.checkboxChecked]}
+    >
+      {checked && <Text style={styles.checkmark}>✓</Text>}
+    </Pressable>
+  );
+}
+
 export function Centered({ children }: { children: React.ReactNode }) {
   return <View style={styles.centered}>{children}</View>;
 }
@@ -180,6 +205,19 @@ export function Loading() {
 }
 
 const styles = StyleSheet.create({
+  checkbox: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderWidth: 2,
+    borderColor: colors.borderStrong,
+    backgroundColor: colors.card,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkboxOnDark: { borderColor: 'rgba(255,255,255,0.85)', backgroundColor: 'transparent' },
+  checkboxChecked: { backgroundColor: colors.primary, borderColor: colors.primary },
+  checkmark: { color: '#fff', fontSize: 11, fontWeight: '700', lineHeight: 13 },
   button: {
     paddingVertical: 12,
     paddingHorizontal: spacing.md,

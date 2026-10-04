@@ -11,6 +11,7 @@ const en = {
     save: 'Save',
     delete: 'Delete',
     networkError: 'Could not reach the server. Please try again.',
+    close: 'Close',
   },
   auth: {
     login: 'Log in',
@@ -41,6 +42,7 @@ const en = {
     markUnread: 'Mark as unread',
     markRead: 'Mark as read',
     unreadCount: '{count} unread',
+    noUrl: 'This item has no link.',
   },
   feeds: {
     title: 'My Feeds',
@@ -89,6 +91,7 @@ const ja: typeof en = {
     save: '保存',
     delete: '削除',
     networkError: 'サーバーに接続できませんでした。もう一度お試しください。',
+    close: '閉じる',
   },
   auth: {
     login: 'ログイン',
@@ -119,6 +122,7 @@ const ja: typeof en = {
     markUnread: '未読にする',
     markRead: '既読にする',
     unreadCount: '未読 {count} 件',
+    noUrl: 'このアイテムにはリンクがありません。',
   },
   feeds: {
     title: 'マイフィード',

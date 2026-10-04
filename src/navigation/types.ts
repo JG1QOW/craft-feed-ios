@@ -1,6 +1,13 @@
+import type { Item } from '../api/types';
+
 export type AuthStackParamList = {
   Login: undefined;
   Register: undefined;
+};
+
+export type ItemsStackParamList = {
+  ItemsList: undefined;
+  ItemViewer: { item: Item };
 };
 
 export type MainTabParamList = {

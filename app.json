@@ -38,7 +38,8 @@
           "resizeMode": "contain",
           "backgroundColor": "#10b981"
         }
-      ]
+      ],
+      "expo-font"
     ],
     "extra": {
       "apiUrl": "https://craft-feed.com",
