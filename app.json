@@ -11,7 +11,14 @@
       "bundleIdentifier": "com.craft-feed.app",
       "usesAppleSignIn": true,
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": [
+              "com.googleusercontent.apps.1012860533845-91iq671ll4cbl35ha1svrhl4rkoss5gu"
+            ]
+          }
+        ]
       }
     },
     "android": {
@@ -46,7 +53,7 @@
     ],
     "extra": {
       "apiUrl": "https://craft-feed.com",
-      "googleIosClientId": "",
+      "googleIosClientId": "1012860533845-91iq671ll4cbl35ha1svrhl4rkoss5gu.apps.googleusercontent.com",
       "eas": {
         "projectId": "b8b0ced9-7b1e-4ad1-ab21-cbba60c57a51"
       }
