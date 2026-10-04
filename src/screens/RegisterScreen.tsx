@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
 import { useAuth } from '../auth/AuthContext';
+import { SocialLoginButtons } from '../components/SocialLoginButtons';
 import { Button, Card, ErrorText, Input, Label } from '../components/ui';
 import { useI18n } from '../i18n';
 import { colors, spacing } from '../theme';
@@ -61,6 +62,7 @@ export function RegisterScreen() {
         />
         <ErrorText message={error} />
         <Button title={t.auth.register} onPress={submit} loading={loading} />
+        <SocialLoginButtons onError={setError} />
         </Card>
       </ScrollView>
     </KeyboardAvoidingView>

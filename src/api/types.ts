@@ -11,6 +11,8 @@ export interface User {
   created_at?: string;
 }
 
+export type SocialProvider = 'google' | 'apple';
+
 export interface TokenResponse {
   token: string;
   token_type: string;

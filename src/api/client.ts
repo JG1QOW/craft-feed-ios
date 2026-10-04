@@ -1,5 +1,5 @@
 import { API_V1, DEVICE_NAME } from '../config';
-import type { Feed, FeedStatus, ItemsResponse, Language, TokenResponse, User } from './types';
+import type { Feed, FeedStatus, ItemsResponse, Language, SocialProvider, TokenResponse, User } from './types';
 
 export class ApiError extends Error {
   status: number;
@@ -89,6 +89,17 @@ export const auth = {
         email,
         password,
         password_confirmation: passwordConfirmation,
+        device_name: DEVICE_NAME,
+      },
+    }),
+  social: (params: { provider: SocialProvider; idToken: string; nonce?: string; name?: string }) =>
+    request<TokenResponse>('/auth/social', {
+      method: 'POST',
+      body: {
+        provider: params.provider,
+        id_token: params.idToken,
+        nonce: params.nonce,
+        name: params.name,
         device_name: DEVICE_NAME,
       },
     }),

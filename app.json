@@ -9,6 +9,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.craft-feed.app",
+      "usesAppleSignIn": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -26,8 +27,10 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
+    "scheme": "craftfeed",
     "plugins": [
       "expo-secure-store",
+      "expo-apple-authentication",
       "expo-web-browser",
       "expo-localization",
       [
@@ -43,6 +46,7 @@
     ],
     "extra": {
       "apiUrl": "https://craft-feed.com",
+      "googleIosClientId": "",
       "eas": {
         "projectId": "b8b0ced9-7b1e-4ad1-ab21-cbba60c57a51"
       }
